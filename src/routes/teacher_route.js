@@ -1,7 +1,9 @@
 const router = require('express').Router();
 const { getTeacher, createTeacher, updateTeacher, deleteTeacher } = require('../controllers/teacher_controller');
+const authorized = require('../middlewares/auth_require');
+const rolPermitido = require('../middlewares/require_role');
 
-const validate = require('../validate/validator');
+const validate = require('../middlewares/validator');
 const { body } = require('express-validator');
 
 const teacherValidation = [
@@ -10,9 +12,21 @@ const teacherValidation = [
     body('email').isEmail().withMessage('El correo electrónico es obligatorio y debe ser válido')
 ];
 
-router.get("/{:email}", getTeacher);
-router.post('/', teacherValidation, validate, createTeacher);
-router.put('/:id', teacherValidation, validate, updateTeacher);
-router.delete("/:id", deleteTeacher);
+router.use(authorized);
+
+/**
+ * @swagger
+ * /teacher/{:email}
+ *   get:
+ *     summary: Obtener un profesor por email
+ *     response:
+ *       200:
+ *         description: Profesor encontrado
+ * 
+ */
+router.get("/{:email}", rolPermitido('teacher'), getTeacher);
+router.post('/', teacherValidation, rolPermitido('teacher'), validate, createTeacher);
+router.put('/:id', teacherValidation, rolPermitido('teacher'), validate, updateTeacher);
+router.delete("/:id", rolPermitido('admin'), deleteTeacher);
 
 module.exports = router;
