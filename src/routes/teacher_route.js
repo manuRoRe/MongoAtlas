@@ -24,7 +24,15 @@ router.use(authorized);
  *         description: Profesor encontrado
  * 
  */
+
+
+
 router.get("/{:email}", rolPermitido('teacher'), getTeacher);
+
+
+
+
+
 router.post('/', teacherValidation, rolPermitido('teacher'), validate, createTeacher);
 router.put('/:id', teacherValidation, rolPermitido('teacher'), validate, updateTeacher);
 router.delete("/:id", rolPermitido('admin'), deleteTeacher);
